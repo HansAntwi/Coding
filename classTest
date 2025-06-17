@@ -7,7 +7,7 @@ questions_prompt = [
     "The Asante King lives in? \n a. Bantama Palace \n b. Manhyia Palace \n",
     "Which one is a programming language? \n a. Python \n b. Snake \n"
 ]
-answers = ['a', 'b', 'a', 'b', 'b'] #add answers of the questions here
+answers = ['a', 'b', 'a', 'b', 'b'] #adding answers of the questions here
 question_and_answer = []
 
 #auto populate Q&As <3
@@ -27,7 +27,7 @@ def run_test(question):
     score = 0
     random.shuffle(question) #randomise the questions
     for index, question in enumerate(question_and_answer, start=1):
-        print(f'\nQuestion {index}: \nChoose and option: ')
+        print(f'\nQuestion {index}: \nChoose an option: ')
         answer = input((question.prompt)).lower()
         print(f'you chose {answer} \n')
         if answer == question.answer:
