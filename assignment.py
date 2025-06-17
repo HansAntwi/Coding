@@ -200,33 +200,39 @@
 
 
 
-'''MERGING SUBLISTS'''
-def merge(left, right):
-    result = []
-    i = 0
-    j = 0
-    while i < len(left) and j < len(right):
-        if left[i] < right[j]:
-            print(f'Appending item { j + i + 1}: {left[i]}')
-            result.append(left[i])
-            i += 1
-        else:
-            print(f'Appending item {j + i + 1}: {right[j]}')
-            result.append(right[j])
-            j += 1
-    while i < len(left):
-        print(f'Appending item {j + i + 1}: {left[i]}')
-        result.append(left[i])
-        i +=1
-    while j < len(right):
-        print(f'Appending item {j + i + 1}: {right[j]}')
-        result.append(right[j])
-        j +=1
-    return result      
+# '''MERGING SUBLISTS'''
+# def merge(left, right):
+#     result = []
+#     i = 0
+#     j = 0
+#     while i < len(left) and j < len(right):
+#         if left[i] < right[j]:
+#             print(f'Appending item { j + i + 1}: {left[i]}')
+#             result.append(left[i])
+#             i += 1
+#         else:
+#             print(f'Appending item {j + i + 1}: {right[j]}')
+#             result.append(right[j])
+#             j += 1
+#     while i < len(left):
+#         print(f'Appending item {j + i + 1}: {left[i]}')
+#         result.append(left[i])
+#         i +=1
+#     while j < len(right):
+#         print(f'Appending item {j + i + 1}: {right[j]}')
+#         result.append(right[j])
+#         j +=1
+#     return result      
 
-list_a  = [7, 2, 4, 9,8, 0]
-a = sorted(list_a) #makes sure list_a is always sorted
-list_b = [5, 1, 3, 10, 6]
-b = sorted(list_b) #makes sure list_b is always sorted
-print(merge(a, b))
+# list_a  = [7, 2, 4, 9,8, 0]
+# a = sorted(list_a) #makes sure list_a is always sorted
+# list_b = [5, 1, 3, 10, 6]
+# b = sorted(list_b) #makes sure list_b is always sorted
+# print(merge(a, b))
             
+
+class Exams:
+    def __init__(self, prompt, answer):
+        self.prompt = prompt
+        self.answer = answer
+        

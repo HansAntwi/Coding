@@ -1,0 +1,37 @@
+from assignment import Exams
+import random   
+questions_prompt = [
+    "What is 1 + 1? \n a. 2 \n b. 3 \n",
+    "What is 2*2? \n a. 3 \n b. 4\n\n",
+    "What is the capital of Ghana? \n a. Accra \n b. Cape Coast \n",
+    "The Asante King lives in? \n a. Bantama Palace \n b. Manhyia Palace \n",
+    "Which one is a programming language? \n a. Python \n b. Snake \n"
+]
+answers = ['a', 'b', 'a', 'b', 'b'] #add answers of the questions here
+question_and_answer = []
+
+#auto populate Q&As <3
+for question, ans in zip(questions_prompt, answers):
+    question_and_answer.append(Exams(question, ans))
+
+    
+#had to be taken off because i had to manually populate the Q&As
+# question_and_answers = [
+#     Exams(questions_prompt[0], 'a'),
+#     Exams(questions_prompt[1], "b"),
+#     Exams(questions_prompt[2], "a"),
+#     Exams(questions_prompt[3], "b"),
+#     Exams(questions_prompt[4], "b")
+# ]
+def run_test(question):
+    score = 0
+    random.shuffle(question) #randomise the questions
+    for index, question in enumerate(question_and_answer, start=1):
+        print(f'\nQuestion {index}: \nChoose and option: ')
+        answer = input((question.prompt)).lower()
+        print(f'you chose {answer} \n')
+        if answer == question.answer:
+            score += 1 
+    print(f"You scored {score}/{len(question_and_answer)} correct ")
+
+run_test(question_and_answer)
