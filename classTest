@@ -33,5 +33,5 @@ def run_test(question):
         if answer == question.answer:
             score += 1 
     print(f"You scored {score}/{len(question_and_answer)} correct ")
-
+    
 run_test(question_and_answer)
