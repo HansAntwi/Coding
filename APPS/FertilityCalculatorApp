@@ -1,0 +1,140 @@
+# from kivy.app import App
+# from kivy.uix.boxlayout import BoxLayout
+# from kivy.uix.label import Label
+# from kivy.uix.textinput import TextInput
+# from kivy.uix.button import Button
+# from datetime import datetime, timedelta
+
+# class FertilityApp(App):
+#     def build(self):
+#         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        
+#         self.last_period_input = TextInput(hint_text="Recent period date (dd/mm/yyyy)")
+#         self.prev_period_input = TextInput(hint_text="Previous period date before Recent period date (dd/mm/yyyy)")
+#         self.result_label = Label(text="Enter your dates above")
+        
+#         calc_button = Button(text="Calculate")
+#         calc_button.bind(on_press=self.calculate_fertility)
+        
+#         layout.add_widget(self.last_period_input)
+#         layout.add_widget(self.prev_period_input)
+#         layout.add_widget(calc_button)
+#         layout.add_widget(self.result_label)
+        
+#         return layout
+    
+#     def calculate_fertility(self, instance):
+#         try:
+#             last_period = datetime.strptime(self.last_period_input.text, '%d/%m/%Y')
+#             prev_period = datetime.strptime(self.prev_period_input.text, '%d/%m/%Y')
+            
+#             diff_in_date = (last_period - prev_period).days
+            
+#             if diff_in_date < 15:
+#                 self.result_label.text = f"⚠️ Cycle is {diff_in_date} days — see a doctor."
+#                 return
+            
+#             fertile_day = last_period + timedelta(days=(diff_in_date - 14))
+#             next_period = last_period + timedelta(days=diff_in_date)
+            
+#             self.result_label.text = (
+#                 f"Period Cycle 📆: {diff_in_date} days\n"
+#                 f"Next Fertility 🤰 Date: {fertile_day.strftime('%d/%m/%Y')}\n"
+#                 f"Next period 🩸: {next_period.strftime('%d/%m/%Y')}"
+#             )
+#         except ValueError:
+#             self.result_label.text = "Invalid date format. Use dd/mm/yyyy."
+
+# FertilityApp().run()
+
+
+from datetime import datetime, timedelta
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivymd.app import MDApp
+from kivymd.uix.pickers import MDDatePicker
+
+KV = """
+BoxLayout:
+    orientation: "vertical"
+    padding: dp(20)
+    spacing: dp(10)
+
+    MDTextField:
+        id: last_period_input
+        hint_text: "Recent period date (dd/mm/yyyy)"
+        on_focus: if self.focus: app.show_calendar('last_period')
+
+    MDTextField:
+        id: prev_period_input
+        hint_text: "Previous period date before Recent period (dd/mm/yyyy)"
+        on_focus: if self.focus: app.show_calendar('prev_period')
+
+    MDRaisedButton:
+        text: "Calculate"
+        pos_hint: {"center_x": 0.5}
+        on_release: app.calculate()
+
+    MDLabel:
+        id: result_label
+        text: "📆 Click above fields to enter or select dates"
+        halign: "left"
+        valign: "middle"
+        theme_text_color: "Primary"
+"""
+
+class FertilityCalculatorApp(MDApp):
+    def build(self):
+        self.title = "Fertility Calculator"
+        return Builder.load_string(KV)
+
+    def show_calendar(self, field_name):
+        """Open date picker and store which field to update."""
+        self.date_field = field_name
+        date_dialog = MDDatePicker()
+        date_dialog.bind(on_save=self.on_date_selected)
+        date_dialog.open()
+
+    def on_date_selected(self, instance, value, date_range):
+        """Insert chosen date into the correct field."""
+        date_str = value.strftime("%d/%m/%Y")
+        if self.date_field == 'last_period':
+            self.root.ids.last_period_input.text = date_str
+        elif self.date_field == 'prev_period':
+            self.root.ids.prev_period_input.text = date_str
+
+    def calculate(self):
+        """Main fertility calculation."""
+        try:
+            last_period = datetime.strptime(self.root.ids.last_period_input.text.strip(), "%d/%m/%Y")
+            prev_period = datetime.strptime(self.root.ids.prev_period_input.text.strip(), "%d/%m/%Y")
+        except ValueError:
+            self.root.ids.result_label.text = "⚠️ Please enter valid dates in dd/mm/yyyy format."
+            return
+
+        diff_in_date = (last_period - prev_period).days
+
+        if diff_in_date <= 0:
+            self.root.ids.result_label.text = "⚠️ Last period must be after previous period."
+            return
+
+        if diff_in_date < 15:
+            self.root.ids.result_label.text = f"⚠️ Cycle length is {diff_in_date} days. Please check with a doctor."
+            return
+
+        fertile_day = last_period + timedelta(days=(diff_in_date - 14))
+        next_period = last_period + timedelta(days=diff_in_date)
+
+        notice = ""
+        if diff_in_date < 20:
+            notice = "⚠️ Note: Cycle shorter than average. Consult a doctor."
+
+        self.root.ids.result_label.text = (
+            f"Cycle length: {diff_in_date} days\n"
+            f"Estimated fertile day: {fertile_day.strftime('%d/%m/%Y')}\n"
+            f"Next period: {next_period.strftime('%d/%m/%Y')}\n"
+            f"{notice}"
+        )
+
+if __name__ == "__main__":
+    FertilityCalculatorApp().run()

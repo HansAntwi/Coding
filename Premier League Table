@@ -1,0 +1,72 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import csv
+import os
+from datetime import datetime
+
+def EPL_table_scraper():
+    url = 'https://www.skysports.com/premier-league-table'
+
+    request = requests.get(url)
+
+    soup = BeautifulSoup(request.text, 'html.parser')
+
+    table = soup.find('thead', class_ = 'sdc-site-table__head')
+
+    headers = table.find_all('th')
+    columns = []
+    for header in headers:
+        header = header.text.strip().split('\n')[-1].strip() # Get the last line of text in case of multi-line headers
+        columns.append(header)
+    # print(columns)
+
+    # body = soup.find('tbody')
+    # print(body.text.strip())
+
+    rows = soup.find_all('tr', class_ = 'sdc-site-table__row')[1:]
+    row_data = []
+    for row in rows:
+        #find all 'td' elements in the row
+        row = row.find_all('td')
+        #keep each row's data as a list and append to row_data
+        row_data.append([cell.text.strip() for cell in row])
+
+    # print(len(row_data))
+    # print(row_data)
+
+
+    epl_df = pd.DataFrame(row_data, columns = columns)
+    # print(epl_df)
+
+    epl_df.to_csv(r"C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Premier_League_Table.csv", index = False)
+
+
+    df = pd.read_csv(r"C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Premier_League_Table.csv")
+
+    #show all columns in the DataFrame
+    # pd.set_option('display.max_columns', None)  # Show all columns
+
+    print(df) 
+    # Add a new column with the current date
+    df['Date'] = datetime.now().strftime('%d-%m-%Y')
+    df['Match Week'] = ''.join(f"MW_{(len(os.listdir('weekly_data')) + 1)}")
+
+    # create a folder to save weekly data 
+    os.makedirs('weekly_data', exist_ok=True)
+
+    #Save the DataFrame with custom filename
+    filename = f"weekly_data/MW{len(os.listdir('weekly_data')) + 1}_{datetime.now().strftime('%d%m%Y')}.csv"
+
+    #save the DataFrame to a CSV file
+    df.to_csv(filename, index=False)
+
+    print(df)
+
+def combine_weekly_data():
+    all_weeks = []
+    for file in os.listdir('weekly_data'):
+        if file.endswith('.csv'):
+            df = pd.read_csv(f'weekly_data/{file}')
+            all_weeks.append(df)
+    return pd.concat(all_weeks)
