@@ -46,14 +46,15 @@ def EPL_table_scraper():
 
     #show all columns in the DataFrame
     # pd.set_option('display.max_columns', None)  # Show all columns
-
+ # create a folder to save weekly data 
+    os.makedirs('weekly_data', exist_ok=True)
+    
     print(df) 
     # Add a new column with the current date
     df['Date'] = datetime.now().strftime('%d-%m-%Y')
     df['Match Week'] = ''.join(f"MW_{(len(os.listdir('weekly_data')) + 1)}")
 
-    # create a folder to save weekly data 
-    os.makedirs('weekly_data', exist_ok=True)
+   
 
     #Save the DataFrame with custom filename
     filename = f"weekly_data/MW{len(os.listdir('weekly_data')) + 1}_{datetime.now().strftime('%d%m%Y')}.csv"
@@ -70,3 +71,10 @@ def combine_weekly_data():
             df = pd.read_csv(f'weekly_data/{file}')
             all_weeks.append(df)
     return pd.concat(all_weeks)
+
+
+if __name__ == "__main__":
+    EPL_table_scraper()
+    combined_df = combine_weekly_data()
+    print(combined_df)
+    combined_df.to_csv('combined_weekly_data.csv', index=False)
