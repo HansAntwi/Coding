@@ -9,16 +9,23 @@ import time
 
 
 #USER INPUTS
-chosen_currency = "USDGHS" #input("Enter the currency you want to select (e.g., USDGHS): \n").strip().upper()
-start_date = "01 Mar 2025" #input("Enter the start date (01 Jan 2025): ").strip()
-end_date = "01 June 2025" #input("Enter the end date (31 Jan 2025): ").strip()
-output = input("Enter your preferred output format (1 for Excel or 2 for CSV): \n 1: Excel \n 2: csv \n").strip().upper()
+chosen_currency = "" #input("Enter the currency you want to select (e.g., \n  USDGHS or GHSXXX \n # All currencies or If no currency selected or currency selected is not found, All available currrencies will be selected): \n").strip().upper()
+
+start_date = "01 jan 2025" #str(input("Enter the start date (01 Jan 2025): ").title()).strip()
+end_date = "20 jan 2025"# str(input("Enter the end date (31 Jan 2025): ").title()).strip()
+
+try:
+    output =1 #input("Enter your preferred output format (1 for Excel or 2 for CSV): \n 1: Excel \n 2: csv \n").strip().upper()
+    if output not in [1, 2, 'EXCEL', 'CSV']:
+        raise ValueError("Invalid output format. Please enter 1 for Excel or 2 for CSV.")
+except ValueError as ve:
+    print(ve)
+    output = 1  # Default to Excel if invalid input
 
 
 driver = webdriver.Chrome()
 driver.maximize_window()
 driver.get('https://www.bog.gov.gh/treasury-and-the-markets/daily-interbank-fx-rates/')
-#maximize window
 driver.implicitly_wait(5)
 wait = WebDriverWait(driver, 5)
 
@@ -48,10 +55,11 @@ try:
     historical_data_button = wait.until(
         EC.element_to_be_clickable((By.CLASS_NAME, 'elementor-button-text'))
     )
+    driver.execute_script("arguments[0].scrollIntoView(true);", historical_data_button)
     historical_data_button.click()
     print('historical button clicked')
 except:
-    print('Program could not reach here')
+    print('Historical button not found')
 
 
 #select currency
@@ -62,23 +70,28 @@ try:
     # currency_dropdown = driver.find_element(By.XPATH, '//th[@class="sort column-cd_currency_pair"]//button[@role="button"]')
     driver.execute_script("arguments[0].scrollIntoView(true);", currency_dropdown)
     currency_dropdown.click()
-    print('currency dropdown clicked')
-    # time.sleep(2)
-    print('looking for elements')
-    # time.sleep(3)
-    print('looking for elements again')
     currencies = wait.until(EC.visibility_of_all_elements_located(
    ( By.XPATH, '(//ul[@class="dropdown-menu inner"])[3]//span[@class="text"]'
     )
     ))
     print('elements found:', len(currencies))
+    all_currencies = []
     for currency in currencies:
+        if currency.text.strip() != '':
+            all_currencies.append(currency.text.strip())
+    print(f'Available currencies: {all_currencies}')
+    time.sleep(2)  
+    currency_found = False  
+    for currency in currencies: 
         if currency.text.strip() == chosen_currency:
+            # time.sleep(1)
             currency.click()
-            print('currency selected')
+            # time.sleep(1)
+            currency_found = True
+            print('{currency} successfully selected')
             break
 except:
-    print('could not select currency')
+    print('All currencies selected')
 
 
 
@@ -89,46 +102,52 @@ try:
     driver.execute_script("var event = new Event('change', { bubbles: true }); arguments[0].dispatchEvent(event);", start_date_input)
     time.sleep(1)
     start_date_input.send_keys(Keys.ENTER)
-    print('Start date set to {start_date}')
     
     end_date_input = wait.until(EC.presence_of_element_located((By.ID, 'table_1_range_to_0')))
     driver.execute_script("arguments[0].value = arguments[1];", end_date_input,  end_date)
     time.sleep(1)
     end_date_input.send_keys(Keys.ENTER)
-    print('End date set to {end_date}')
+    time.sleep(2)
 except:
     print('could not find start date input')
 
 #filter for all
-
-
+try:
+    filter_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="btn dropdown-toggle btn-default"]')))
+    driver.execute_script("arguments[0].scrollIntoView(true);", filter_button)
+    filter_button.click()
+    all_button = wait.until(EC.visibility_of_all_elements_located((By.XPATH, '(//ul[@class="dropdown-menu inner"])[1]//li')))
+    print(f'buttons found {len(all_button)}')
+    for button in all_button:
+        if button.text.strip() == 'All':
+            button.click()
+            time.sleep(3)
+            print('All button clicked')
+            break
+except:
+    print('could not find all button')
 
 #export button
 try:
     export_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@class = "dt-button buttons-collection DTTT_button DTTT_button_export"]')))
-    print('export button located')
     driver.execute_script("arguments[0].scrollIntoView(true);", export_button)
     time.sleep(2)
-    print('export button found')
     export_button.click()
-    print('export button clicked')
 except:
     print('could not find export button')
 
 
 #click excel or csv
-if output == 'EXCEL' or output == '1':
+if output == 'EXCEL' or output == 1:
     try:
         Excel_output = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="dt-button buttons-excel buttons-html5"]'))).click()
-        print('Excel output clicked')
         print('Excel file successfully downloaded')
     except:
         print('could not find excel output button')
 
-if output == 'CSV' or output == '2':    
+if output == 'CSV' or output == 2:    
     try:
         CSV_output = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.dt-button.buttons-csv.buttons-html5'))).click()
-        print('CSV output clicked')
         print('CSV file successfully downloaded')
     except:
         print('could not find CSV output button')
