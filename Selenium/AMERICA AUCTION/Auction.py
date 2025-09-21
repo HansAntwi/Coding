@@ -287,22 +287,22 @@ print(len(all_urls))
 
 auction_df = pd.DataFrame(
     {
-        "Lot Number": all_lots,
-        'Item': all_items,
-        'Lot Status': all_lot_state,
-        'Bid Status': all_bid_status,
-        "Current Bid Price": all_curr_bid_prices,
-        "Lot Description": all_lots_desc,
-        'Link': all_urls
+        "LOT NUMBER": all_lots,
+        'ITEM': all_items,
+        'LOT STATUS': all_lot_state,
+        'BID STATUS': all_bid_status,
+        "CURRENT BID PRICE": all_curr_bid_prices,
+        "LOT DESCRIPTION": all_lots_desc,
+        'LINK': all_urls
     }
 )
 
 print(auction_df.info())
 print(auction_df.head())
 
-auction_df.to_csv("America_Auction.csv")
+auction_df.to_csv(r'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\AMERICA AUCTION\America_Auction.csv', index=False)
 
-df_auction = pd.read_csv("America_Auction.csv")
+df_auction = pd.read_csv(r'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\AMERICA AUCTION\America_Auction.csv')
 print(df_auction)
 
 
