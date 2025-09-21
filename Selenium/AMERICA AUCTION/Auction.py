@@ -45,6 +45,7 @@ STEPS:
 4. select country by capital town
 5. period left
 6. items and descriptions
+7. save as csv
 
 """
 
@@ -93,6 +94,7 @@ try:
         print("Login failed")   
 except Exception as e:
     print('Could not log in. \nProvide valid details', e)
+    
 
 #selecting country by capital town
 try:
@@ -219,9 +221,13 @@ while True:
     all_bid_status.extend(bid_status)
     
     current_prices = driver.find_elements(By.XPATH, '//div[contains(@data-format,"01")]')
+    currency_symbol = wait.until(EC.presence_of_element_located((By.XPATH, '//span[contains(@class,"input-group-addon left fontBold")][1]'))).text.strip()
+    
     # print(len(current_prices))
     prices = [price.text.strip() for i, price in enumerate(current_prices) if i%2 ==0]
-    all_curr_bid_prices.extend(prices)
+    new_prices = [currency_symbol+" "+price for price in prices]
+        
+    all_curr_bid_prices.extend(new_prices)
     
     lot_desc_element = driver.find_elements(By.XPATH, '//div[@class="form-control textarea oa-bg-orange"]')
     needed_desc = lot_desc_element[0::2]
@@ -238,7 +244,7 @@ while True:
     
     
     
-    for lot_num, item, lot_state, status, price, description, url in zip(lots_num, items, lot_states, bid_status, prices, lot_descs, new_urls):
+    for lot_num, item, lot_state, status, price, description, url in zip(lots_num, items, lot_states, bid_status, new_prices, lot_descs, new_urls):
         print(f'Lot {lot_num} \n {item} \n Lot Status -- {lot_state}\n Bidding Status -- {status} \n Current bid price is {price} \n Description: \n {description},\n Lot link -- {url}')
         print()
     
@@ -297,10 +303,11 @@ auction_df = pd.DataFrame(
     }
 )
 
-print(auction_df.info())
-print(auction_df.head())
+# print(auction_df.info())
+# print(auction_df.head())
 
-auction_df.to_csv(r'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\AMERICA AUCTION\America_Auction.csv', index=False)
+#was getting extra character before currency symbol so i added encoding
+auction_df.to_csv(r'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\AMERICA AUCTION\America_Auction.csv', index=False, encoding='utf-8-sig')
 
 df_auction = pd.read_csv(r'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\AMERICA AUCTION\America_Auction.csv')
 print(df_auction)
