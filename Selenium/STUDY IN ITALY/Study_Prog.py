@@ -17,6 +17,7 @@ chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 
 course = input('Enter Programme to search: ')
+
 """
 steps
 
@@ -61,10 +62,12 @@ except:
 
 #selecting eng courses only
 try:
+    # time.sleep(2)
     course_language = wait.until(EC.presence_of_element_located((By.XPATH, '//input[@value="EN"]')))
-    driver.execute_script("arguments[0].scrollIntoView(true);", course_language)
+    
     time.sleep(1)
-    course_language.click()
+    driver.execute_script("arguments[0].click();", course_language)
+    
 except:
     print('Could not select EN filter')
 
@@ -180,8 +183,10 @@ df = pd.DataFrame({
 
 print(df)
 
-
-df.to_csv(fr'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\STUDY IN ITALY\{course}.csv', index=False, encoding='utf-8-sig')
+if course =="":
+    df.to_csv(fr'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\STUDY IN ITALY\all_courses.csv', index=False, encoding='utf-8-sig')
+else:
+    df.to_csv(fr'C:\Users\HANS ANTWI\OneDrive\Documents\Python Coding\Coding\Selenium\STUDY IN ITALY\{course}.csv', index=False, encoding='utf-8-sig')
 
 
 quit = input("Press Enter to quit")
